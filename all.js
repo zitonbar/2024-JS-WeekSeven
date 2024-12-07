@@ -4,6 +4,7 @@ axios.get('https://raw.githubusercontent.com/hexschool/js-training/main/travelAP
     .then(function (response) {
         ticketsData = response.data;
         renderTickets();
+        renderChart(ticketsData);
     })
     .catch(function (err) {
         console.log(err);
@@ -68,6 +69,7 @@ dropdownFilterBtn.addEventListener('change', (event) =>{
     }
     renderTickets();
     searchResultNum();
+    renderChart(filteredTicketsData);
 });
 
 const errorMessage = `<i class="fas fa-exclamation-circle"></i><span>必須!</span>`;
@@ -109,3 +111,32 @@ document.querySelector('.addTicket-btn').addEventListener('click', function(){
         renderTickets();
     }
 });
+function renderChart(){
+  const dataToChart = filteredTicketsData.length === 0 ? ticketsData : filteredTicketsData ;
+  let chartObj = {};
+  dataToChart.forEach(item =>{
+    if(chartObj[item.area] === undefined){
+      chartObj[item.area] = 1;
+    }else{
+      chartObj[item.area] += 1;
+    }
+  });
+  let chartData = [];
+  let area = Object.keys(chartObj);
+  area.forEach(item =>{
+    let chartAry = [];
+    chartAry.push(item);
+    chartAry.push(chartObj[item]);
+    chartData.push(chartAry);
+  });
+  const chart = c3.generate({
+    bindto: '#chart',
+    data: {
+      columns: chartData,
+      type: 'donut',
+    },
+    donut: {
+      title: "地區"
+    }
+  });
+};
